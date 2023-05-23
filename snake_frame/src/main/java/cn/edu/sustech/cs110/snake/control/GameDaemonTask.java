@@ -26,9 +26,8 @@ public class GameDaemonTask implements Runnable {
 
         Map<Position, GridState> diffs = new HashMap<>(3);
 
-        // TODO: manage the `diffs` map, you should add the correct changes into it
 
-
+        //吃豆并生成
         if (headFwd.equals(game.getBean())) {
             game.getSnake().getBody().add(0, headFwd);
             diffs.put(headFwd, GridState.SNAKE_ON);
@@ -36,7 +35,7 @@ public class GameDaemonTask implements Runnable {
             Position newTail = game.getSnake().getBody().get(game.getSnake().getBody().size() - 1);
             diffs.put(newTail, GridState.SNAKE_ON);
 
-            boolean coincide = false;
+            boolean coincide;
             Position newOne;
             do {
                 coincide = false;
@@ -53,12 +52,23 @@ public class GameDaemonTask implements Runnable {
 
             Context.INSTANCE.eventBus().post(new BeanAteEvent(diffs));
         }
+        //没吃豆继续跑
         else {
             game.getSnake().getBody().add(0, headFwd);
             diffs.put(headFwd, GridState.SNAKE_ON);
             diffs.put(game.getSnake().getBody().get(game.getSnake().getBody().size() - 1), GridState.EMPTY);
             game.getSnake().getBody().remove(game.getSnake().getBody().size() - 1);
         }
+
+        //判定撞边
+        if (headFwd.getX() < 0 || headFwd.getX() > game.getRow() || headFwd.getY() < 0 || headFwd.getY() > game.getCol()){
+            game.setPlaying(false);
+
+
+            Context.INSTANCE.eventBus().post(new GameOverEvent(diffs));
+        }
+
+
         Context.INSTANCE.eventBus().post(new BoardRerenderEvent(diffs));
     }
 }
