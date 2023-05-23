@@ -1,7 +1,6 @@
 package cn.edu.sustech.cs110.snake.events;
 
 import cn.edu.sustech.cs110.snake.enums.GridState;
-import cn.edu.sustech.cs110.snake.model.Game;
 import cn.edu.sustech.cs110.snake.model.Position;
 import java.util.Map;
 

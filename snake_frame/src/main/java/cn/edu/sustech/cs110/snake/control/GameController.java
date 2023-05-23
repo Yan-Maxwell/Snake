@@ -82,7 +82,6 @@ public class GameController implements Initializable {
 
     public void doRestart() {
         // TODO: add some code here
-        Context.INSTANCE.currentGame().setPlaying(!Context.INSTANCE.currentGame().isPlaying());
     }
 
     public void doRecover() {
@@ -132,21 +131,26 @@ public class GameController implements Initializable {
         );
     }
 
-    @Subscribe
-    public void rerenderChanges(BoardRerenderEvent event) {
-        board.repaint(event.getDiff());
-    }
-
-    @Subscribe
-    public void beanAte(BeanAteEvent event) {
-        board.repaint(event.getDiff());
-    }
-
-    @Subscribe
-    public void gameOver(GameOverEvent event) {
-        Context.INSTANCE.currentGame().setPlaying(false);
-
-        // TODO: add some code here
-        System.out.println("Game over");
-    }
+//    @Subscribe
+//    public void rerenderChanges(BoardRerenderEvent event) {
+//        board.repaint(event.getDiff());
+//    }
+//
+//    @Subscribe
+//    public void beanAte(BeanAteEvent event) {
+//        Position headFwd = game.getSnake().getBody().get(0).toward(game.getSnake().getDirection());
+//        board.repaint(event.getDiff());
+//        Position prep =game.getSnake().getBody().get(game.getSnake().getBody().size()-1);
+//        game.getSnake().getBody().add(prep);
+//        Map<Position, GridState> diffs = new HashMap<>(3);
+//        diffs.put(prep,GridState.SNAKE_ON);
+//    }
+//
+//    @Subscribe
+//    public void gameOver(GameOverEvent event) {
+//        Context.INSTANCE.currentGame().setPlaying(false);
+//
+//        // TODO: add some code here
+//        System.out.println("Game over");
+//    }
 }

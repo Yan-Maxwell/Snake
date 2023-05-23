@@ -14,7 +14,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
 
-        Context.INSTANCE.currentGame(new Game(15, 15));
+        Context.INSTANCE.currentGame(new Game(15, 15, "p1"));
         new AdvancedStage("game.fxml")
                 .withTitle("Snake")
                 .shows();

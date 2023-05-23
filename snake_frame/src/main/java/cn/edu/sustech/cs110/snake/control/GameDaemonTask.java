@@ -60,7 +60,7 @@ public class GameDaemonTask implements Runnable {
             game.getSnake().getBody().remove(game.getSnake().getBody().size() - 1);
         }
 
-        //判定撞边
+        //判定撞边并停止游戏
         if (headFwd.getX() < 0 || headFwd.getX() > game.getRow() || headFwd.getY() < 0 || headFwd.getY() > game.getCol()){
             game.setPlaying(false);
 
