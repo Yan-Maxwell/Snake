@@ -36,7 +36,18 @@ public class GameDaemonTask implements Runnable {
             Position newTail = game.getSnake().getBody().get(game.getSnake().getBody().size() - 1);
             diffs.put(newTail, GridState.SNAKE_ON);
 
-            Position newOne = new Position(Context.INSTANCE.random().nextInt(game.getRow()), Context.INSTANCE.random().nextInt(game.getCol()));
+            boolean coincide = false;
+            Position newOne;
+            do {
+                coincide = false;
+                newOne = new Position(Context.INSTANCE.random().nextInt(game.getRow()), Context.INSTANCE.random().nextInt(game.getCol()));
+                for (int i = 0; i < game.getSnake().getBody().size(); i++) {
+                    if (newOne.equals(game.getSnake().getBody().get(i))) {
+                        coincide = true;
+                        break;
+                    }
+                }
+            }while (coincide);
             game.setBean(newOne);
             diffs.put(newOne,GridState.BEAN_ON);
 
