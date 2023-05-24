@@ -14,6 +14,8 @@ public final class Context {
     private final Random random = new SecureRandom();
     private Game currentGame;
 
+    private String currentUser;
+
     @java.lang.SuppressWarnings("all")
     public EventBus eventBus() {
         return this.eventBus;
@@ -45,5 +47,13 @@ public final class Context {
     public Context currentGame(final Game currentGame) {
         this.currentGame = currentGame;
         return this;
+    }
+
+    public String getCurrentUser() {
+        return currentUser;
+    }
+
+    public void setCurrentUser(String currentUser) {
+        this.currentUser = currentUser;
     }
 }
