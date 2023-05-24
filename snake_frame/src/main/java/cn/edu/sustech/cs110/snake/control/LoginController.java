@@ -6,6 +6,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Button;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import java.util.Optional;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -29,11 +32,9 @@ public class LoginController {
         try {
             File usersFile = new File("users.txt");
             if (!usersFile.exists()) {
-                // If the file doesn't exist, create a new file
                 usersFile.createNewFile();
             }
 
-            // Read user data from the file using Scanner
             Scanner in = new Scanner(usersFile);
             boolean userExists = false;
             boolean passwordCorrect = false;
@@ -62,15 +63,24 @@ public class LoginController {
                 FileWriter fileWriter = new FileWriter(usersFile, true);
                 fileWriter.write(newUser.toString() + "\n");
                 fileWriter.close();
-            } else if (!passwordCorrect) {
-                // Password is incorrect
-                // TODO: Handle incorrect password
+            }
+            else if (!passwordCorrect) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Incorrect Password");
+                alert.setHeaderText(null);
+                alert.setContentText("Your password is incorrect!");
+                ButtonType backButton = new ButtonType("Back");
+                alert.getButtonTypes().setAll(backButton);
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.isPresent() && result.get() == backButton) {
+                    return;
+                }
                 return;
             }
 
-            // Proceed to home screen
             Context.INSTANCE.setCurrentUser(username);
             HomeController.showHomeScreen();
+            login.getScene().getWindow().hide();
 
         } catch (IOException e) {
             e.printStackTrace();

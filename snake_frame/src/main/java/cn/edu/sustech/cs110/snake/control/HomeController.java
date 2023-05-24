@@ -4,6 +4,7 @@ import cn.edu.sustech.cs110.snake.view.AdvancedStage;
 import cn.edu.sustech.cs110.snake.Context;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -12,6 +13,9 @@ import java.io.IOException;
 public class HomeController{
     @FXML
     private Parent root;
+
+    @FXML
+    private Button Play;
 
     public static void showHomeScreen() throws IOException {
         new AdvancedStage("home.fxml")
@@ -22,5 +26,6 @@ public class HomeController{
 
     public void playGame() throws IOException {
         GameController.showGameView();
+        Play.getScene().getWindow().hide();
     }
 }
