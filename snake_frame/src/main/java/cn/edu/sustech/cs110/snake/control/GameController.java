@@ -6,17 +6,21 @@ import cn.edu.sustech.cs110.snake.enums.GridState;
 import cn.edu.sustech.cs110.snake.events.*;
 import cn.edu.sustech.cs110.snake.model.Game;
 import cn.edu.sustech.cs110.snake.model.Position;
+import cn.edu.sustech.cs110.snake.view.AdvancedStage;
 import cn.edu.sustech.cs110.snake.view.components.GameBoard;
 import com.google.common.eventbus.Subscribe;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.*;
@@ -50,6 +54,7 @@ public class GameController implements Initializable {
     volatile ScheduledFuture<?> gameDaemonTask;
     public Game game;
 
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         scheduler.scheduleAtFixedRate(() -> {
@@ -57,6 +62,10 @@ public class GameController implements Initializable {
                 return;
             }
             // TODO: add some code here
+            else{Context.INSTANCE.currentGame(new Game(15, 15, "p1"));
+            new AdvancedStage("game.fxml")
+                    .withTitle("Snake")
+                    .shows();}
         }, 0, 1000, TimeUnit.MILLISECONDS);
 
         setupDaemonScheduler();
@@ -131,26 +140,33 @@ public class GameController implements Initializable {
         );
     }
 
-//    @Subscribe
-//    public void rerenderChanges(BoardRerenderEvent event) {
-//        board.repaint(event.getDiff());
-//    }
-//
-//    @Subscribe
-//    public void beanAte(BeanAteEvent event) {
-//        Position headFwd = game.getSnake().getBody().get(0).toward(game.getSnake().getDirection());
-//        board.repaint(event.getDiff());
-//        Position prep =game.getSnake().getBody().get(game.getSnake().getBody().size()-1);
-//        game.getSnake().getBody().add(prep);
-//        Map<Position, GridState> diffs = new HashMap<>(3);
-//        diffs.put(prep,GridState.SNAKE_ON);
-//    }
-//
-//    @Subscribe
-//    public void gameOver(GameOverEvent event) {
-//        Context.INSTANCE.currentGame().setPlaying(false);
-//
-//        // TODO: add some code here
-//        System.out.println("Game over");
-//    }
+    @Subscribe
+    public void rerenderChanges(BoardRerenderEvent event) {
+        board.repaint(event.getDiff());
+    }
+
+    @Subscribe
+    public void beanAte(BeanAteEvent event) {
+        Position headFwd = game.getSnake().getBody().get(0).toward(game.getSnake().getDirection());
+        board.repaint(event.getDiff());
+        Position prep =game.getSnake().getBody().get(game.getSnake().getBody().size()-1);
+        game.getSnake().getBody().add(prep);
+        Map<Position, GridState> diffs = new HashMap<>(3);
+        diffs.put(prep,GridState.SNAKE_ON);
+    }
+
+    @Subscribe
+    public void gameOver(GameOverEvent event) {
+        Context.INSTANCE.currentGame().setPlaying(false);
+
+        // TODO: add some code here
+        System.out.println("Game over");
+    }
+
+    public static void showGameView() {
+        Context.INSTANCE.currentGame(new Game(15, 15, Context.INSTANCE.getCurrentUser()));
+        new AdvancedStage("game.fxml")
+                .withTitle("Snake")
+                .shows();
+    }
 }
