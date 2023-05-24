@@ -1,9 +1,14 @@
 package cn.edu.sustech.cs110.snake;
 
-import cn.edu.sustech.cs110.snake.model.Game;
+import cn.edu.sustech.cs110.snake.control.LoginController;
 import cn.edu.sustech.cs110.snake.view.AdvancedStage;
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
+
+import java.io.IOException;
 
 public class Main extends Application {
 
@@ -12,11 +17,9 @@ public class Main extends Application {
     }
 
     @Override
-    public void start(Stage stage) {
-
-        Context.INSTANCE.currentGame(new Game(15, 15, "p1"));
-        new AdvancedStage("game.fxml")
-                .withTitle("Snake")
+    public void start(Stage stage) throws IOException {
+        new AdvancedStage("login.fxml")
+                .withTitle("Login in")
                 .shows();
     }
 }
