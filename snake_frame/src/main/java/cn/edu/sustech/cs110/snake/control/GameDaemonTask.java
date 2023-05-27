@@ -34,13 +34,10 @@ public class GameDaemonTask implements Runnable {
         if (headFwd.equals(game.getBean())) {
             game.getSnake().getBody().add(0, headFwd);
             diffs.put(headFwd, GridState.SNAKE_ON);
-
             Position newTail = game.getSnake().getBody().get(game.getSnake().getBody().size() - 1);
             diffs.put(newTail, GridState.SNAKE_ON);
-
             boolean coincide;
             Position newOne;
-            //若豆子与蛇重叠则重新生成
             do {
                 coincide = false;
                 newOne = new Position(Context.INSTANCE.random().nextInt(game.getRow()), Context.INSTANCE.random().nextInt(game.getCol()));
@@ -53,8 +50,12 @@ public class GameDaemonTask implements Runnable {
             }while (coincide);
             game.setBean(newOne);
             diffs.put(newOne,GridState.BEAN_ON);
-
             Context.INSTANCE.eventBus().post(new BeanAteEvent(diffs));
+        }
+        //撞墙则Game Over
+        else if (headFwd.getX() < 0 || headFwd.getX() > game.getRow() || headFwd.getY() < 0 || headFwd.getY() > game.getCol()) {
+            Context.INSTANCE.eventBus().post(new GameOverEvent());
+            game.setPlaying(false);
         }
         //没吃豆继续跑
         else {
@@ -62,22 +63,15 @@ public class GameDaemonTask implements Runnable {
             diffs.put(headFwd, GridState.SNAKE_ON);
             diffs.put(game.getSnake().getBody().get(game.getSnake().getBody().size() - 1), GridState.EMPTY);
             game.getSnake().getBody().remove(game.getSnake().getBody().size() - 1);
-            Context.INSTANCE.eventBus().post(new BeanAteEvent(diffs));
+            Context.INSTANCE.eventBus().post(new BoardRerenderEvent(diffs));
         }
-
-        //判定撞边并停止游戏
-        if (headFwd.getX() < 0 || headFwd.getX() > game.getRow() || headFwd.getY() < 0 || headFwd.getY() > game.getCol()){
-            game.setPlaying(false);
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("gameOver");
-            alert.setHeaderText(null);
-            alert.setContentText("Game over!");
-            ButtonType backButton = new ButtonType("Back");
-            alert.getButtonTypes().setAll(backButton);
-            Optional<ButtonType> result = alert.showAndWait();
-            Context.INSTANCE.eventBus().post(new GameOverEvent(diffs));
+        //头撞到身体则Game Over
+        for (int i = 1; i < game.getSnake().getBody().size(); i++) {
+            if(headFwd.equals(game.getSnake().getBody().get(i))) {
+                Context.INSTANCE.eventBus().post(new GameOverEvent());
+                game.setPlaying(false);
+            }
         }
-
 
         Context.INSTANCE.eventBus().post(new BoardRerenderEvent(diffs));
     }
