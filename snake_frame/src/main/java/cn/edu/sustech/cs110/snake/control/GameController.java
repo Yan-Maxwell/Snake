@@ -150,7 +150,7 @@ public class GameController implements Initializable {
         //存分数
         save.println(Context.INSTANCE.currentGame().getScore());
         //存蛇身位置集合
-        for (int i = Context.INSTANCE.currentGame().getSnake().getBody().size(); i > 0 ; i--) {
+        for (int i = Context.INSTANCE.currentGame().getSnake().getBody().size()-1; i > 0 ; i--) {
             save.println(Context.INSTANCE.currentGame().getSnake().getBody().get(i).getX()+" "+Context.INSTANCE.currentGame().getSnake().getBody().get(i).getY());
         }
 
