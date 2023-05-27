@@ -37,6 +37,7 @@ public class GameDaemonTask implements Runnable {
 
             boolean coincide;
             Position newOne;
+            //若豆子与蛇重叠则重新生成
             do {
                 coincide = false;
                 newOne = new Position(Context.INSTANCE.random().nextInt(game.getRow()), Context.INSTANCE.random().nextInt(game.getCol()));

@@ -45,9 +45,6 @@ public class GameController implements Initializable {
     @FXML
     private GameBoard board;
 
-    @FXML
-    private Text textPlayerName;
-
     private static final long MOVE_DURATION = 500;
 
     @SuppressWarnings("AlibabaThreadPoolCreation")
@@ -75,7 +72,6 @@ public class GameController implements Initializable {
 
         Platform.runLater(this::bindAccelerators);
         board.paint(Context.INSTANCE.currentGame());
-        textPlayerName.setText("Player: "+Context.INSTANCE.getCurrentUser());
     }
 
     private void bindAccelerators() {
@@ -89,11 +85,8 @@ public class GameController implements Initializable {
     }
 
     public void togglePause() {
+        // TODO: change the text in menu's pause item and button
         Context.INSTANCE.currentGame().setPlaying(!Context.INSTANCE.currentGame().isPlaying());
-    }
-
-    public void toggleRestart(){
-        Context.INSTANCE.currentGame().setPlaying(Context.INSTANCE.currentGame().isPlaying());
     }
 
     public void doRestart() {
@@ -171,6 +164,7 @@ public class GameController implements Initializable {
     }
 
     public static void showGameView() {
+        Context.INSTANCE.currentGame(new Game(15, 15, Context.INSTANCE.getCurrentUser()));
         new AdvancedStage("game.fxml")
                 .withTitle("Snake")
                 .shows();
