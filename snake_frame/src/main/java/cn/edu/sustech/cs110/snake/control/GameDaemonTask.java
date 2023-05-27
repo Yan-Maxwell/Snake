@@ -7,10 +7,13 @@ import cn.edu.sustech.cs110.snake.events.BoardRerenderEvent;
 import cn.edu.sustech.cs110.snake.events.GameOverEvent;
 import cn.edu.sustech.cs110.snake.model.Game;
 import cn.edu.sustech.cs110.snake.model.Position;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 public class GameDaemonTask implements Runnable {
 
@@ -59,13 +62,19 @@ public class GameDaemonTask implements Runnable {
             diffs.put(headFwd, GridState.SNAKE_ON);
             diffs.put(game.getSnake().getBody().get(game.getSnake().getBody().size() - 1), GridState.EMPTY);
             game.getSnake().getBody().remove(game.getSnake().getBody().size() - 1);
+            Context.INSTANCE.eventBus().post(new BeanAteEvent(diffs));
         }
 
         //判定撞边并停止游戏
         if (headFwd.getX() < 0 || headFwd.getX() > game.getRow() || headFwd.getY() < 0 || headFwd.getY() > game.getCol()){
             game.setPlaying(false);
-
-
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("gameOver");
+            alert.setHeaderText(null);
+            alert.setContentText("Game over!");
+            ButtonType backButton = new ButtonType("Back");
+            alert.getButtonTypes().setAll(backButton);
+            Optional<ButtonType> result = alert.showAndWait();
             Context.INSTANCE.eventBus().post(new GameOverEvent(diffs));
         }
 

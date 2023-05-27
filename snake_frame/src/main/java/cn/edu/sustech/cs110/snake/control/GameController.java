@@ -62,10 +62,6 @@ public class GameController implements Initializable {
                 return;
             }
             // TODO: add some code here
-            else{Context.INSTANCE.currentGame(new Game(15, 15, Context.INSTANCE.getCurrentUser()));
-            new AdvancedStage("game.fxml")
-                    .withTitle("Snake")
-                    .shows();}
         }, 0, 1000, TimeUnit.MILLISECONDS);
 
         setupDaemonScheduler();
@@ -145,15 +141,15 @@ public class GameController implements Initializable {
         board.repaint(event.getDiff());
     }
 
-    @Subscribe
-    public void beanAte(BeanAteEvent event) {
-        Position headFwd = game.getSnake().getBody().get(0).toward(game.getSnake().getDirection());
-        board.repaint(event.getDiff());
-        Position prep =game.getSnake().getBody().get(game.getSnake().getBody().size()-1);
-        game.getSnake().getBody().add(prep);
-        Map<Position, GridState> diffs = new HashMap<>(3);
-        diffs.put(prep,GridState.SNAKE_ON);
-    }
+//    @Subscribe
+//    public void beanAte(BeanAteEvent event) {
+//        Position headFwd = game.getSnake().getBody().get(0).toward(game.getSnake().getDirection());
+//        board.repaint(event.getDiff());
+//        Position prep =game.getSnake().getBody().get(game.getSnake().getBody().size()-1);
+//        game.getSnake().getBody().add(prep);
+//        Map<Position, GridState> diffs = new HashMap<>(3);
+//        diffs.put(prep,GridState.SNAKE_ON);
+//    }
 
     @Subscribe
     public void gameOver(GameOverEvent event) {
@@ -163,10 +159,4 @@ public class GameController implements Initializable {
         System.out.println("Game over");
     }
 
-    public static void showGameView() {
-        Context.INSTANCE.currentGame(new Game(15, 15, Context.INSTANCE.getCurrentUser()));
-        new AdvancedStage("game.fxml")
-                .withTitle("Snake")
-                .shows();
-    }
 }
