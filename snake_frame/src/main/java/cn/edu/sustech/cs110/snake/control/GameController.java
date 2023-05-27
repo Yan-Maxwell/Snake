@@ -51,6 +51,13 @@ public class GameController implements Initializable {
     @FXML
     private GameBoard board;
 
+    @FXML
+    private Text textPlayerName;
+
+    private long startTime; // 记录游戏开始时间
+    private long elapsedTime; // 记录游戏已经过去的时间
+    private Timer timer; // 用于定时更新游戏时间
+
     private long MOVE_DURATION = 500;
 
     @SuppressWarnings("AlibabaThreadPoolCreation")
@@ -92,15 +99,22 @@ public class GameController implements Initializable {
     public void togglePause() {
         // TODO: change the text in menu's pause item and button
         Context.INSTANCE.currentGame().setPlaying(!Context.INSTANCE.currentGame().isPlaying());
+        if (Context.INSTANCE.currentGame().isPlaying()) {
+            startTimer();
+        } else {
+            stopTimer();
+        }
     }
 
-    public void doRestart() {
+    public void doRestart() throws FileNotFoundException {
         // 取消之前的任务
         if (Objects.nonNull(gameDaemonTask)) {
             gameDaemonTask.cancel(true);
         }
         // 创建新的游戏对象
         Context.INSTANCE.currentGame(new Game(15, 15, Context.INSTANCE.getCurrentUser()));
+        stopTimer();
+        elapsedTime = 0;
         new AdvancedStage("game.fxml")
                 .withTitle("Snake")
                 .shows();
@@ -119,9 +133,18 @@ public class GameController implements Initializable {
     }
 
     public void record() throws IOException {
-        File file = new File("record.txt");
-        FileWriter writer = new FileWriter(file,true);
-        writer.write(game.getPlayer() + " " + game.getScore());
+//        File file = new File("records.txt");
+//        FileWriter writer = new FileWriter(file,true);
+//        writer.write(game.getPlayer() + " " + game.getScore()+" ");
+//        writer.close();
+    }
+
+    private void updateScoreLabel() {
+        int score = Context.INSTANCE.currentGame().getScore();
+        Platform.runLater(() -> {
+            textCurrentScore.setText("Current score: "+String.valueOf(score));
+            Context.INSTANCE.currentGame().setScore(score);
+        });
     }
 
     public void QuitToLogin() {
@@ -139,7 +162,7 @@ public class GameController implements Initializable {
         // TODO: add some code here
     }
 
-    public void doSave() throws FileNotFoundException {
+    public void doSave() throws IOException {
         // TODO: add some code here
         File file = new File(Context.INSTANCE.currentGame().getPlayer()+"Archive.txt");
         PrintWriter save = new PrintWriter(file);
@@ -153,6 +176,8 @@ public class GameController implements Initializable {
         for (int i = Context.INSTANCE.currentGame().getSnake().getBody().size()-1; i > 0 ; i--) {
             save.println(Context.INSTANCE.currentGame().getSnake().getBody().get(i).getX()+" "+Context.INSTANCE.currentGame().getSnake().getBody().get(i).getY());
         }
+        //存本次游戏记录
+        record();
 
         save.close();
     }
@@ -177,6 +202,45 @@ public class GameController implements Initializable {
         setupDaemonScheduler();
     }
 
+    private void startTimer() {
+        startTime = System.currentTimeMillis();
+        timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                updateElapsedTime();
+                updateGameTimeLabel();
+            }
+        }, 0, 100); // 每100毫秒更新一次时间
+    }
+
+    private void stopTimer() {
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+    }
+
+    private void updateElapsedTime() {
+        if (Context.INSTANCE.currentGame().isPlaying()) {
+            long currentTime = System.currentTimeMillis();
+            elapsedTime += currentTime - startTime;
+            startTime = currentTime;
+        }
+    }
+
+    private void updateGameTimeLabel() {
+        long totalSeconds = elapsedTime / 1000;
+        long minutes = totalSeconds / 60;
+        long seconds = totalSeconds % 60;
+        long milliseconds = elapsedTime % 1000;
+
+        Platform.runLater(() -> {
+            textTimeAlive.setText("Time alive: "+String.format("%02d:%02d:%03d", minutes, seconds, milliseconds)+"s");
+            Context.INSTANCE.currentGame().setDuration(String.format("%02d:%02d:%03d", minutes, seconds, milliseconds));
+        });
+    }
+
     private void setupDaemonScheduler() {
         if (Objects.nonNull(gameDaemonTask)) {
             gameDaemonTask.cancel(true);
@@ -186,6 +250,8 @@ public class GameController implements Initializable {
                 0, MOVE_DURATION,
                 TimeUnit.MILLISECONDS
         );
+
+        textPlayerName.setText("Player: "+Context.INSTANCE.getCurrentUser());
     }
 
     @Subscribe
@@ -196,17 +262,18 @@ public class GameController implements Initializable {
     @Subscribe
     public void beanAte(BeanAteEvent event) {
         board.repaint(event.getDiff());
+        updateScoreLabel();
     }
 
     @Subscribe
-    public void gameOver(GameOverEvent event) {
+    public void gameOver(GameOverEvent event) throws IOException {
 
-
+        record();
 
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setHeaderText("Game Over");
-            alert.setContentText("Game Over！Please choose to go back to the home screen or restart a new game!");
+            alert.setHeaderText("GAME OVER!\n"+"\n"+"Player: "+Context.INSTANCE.getCurrentUser()+"\n"+"Your score: "+Context.INSTANCE.currentGame().getScore()+"\n"+"Time alive: "+Context.INSTANCE.currentGame().getDuration()+"s");
+            alert.setContentText("Please choose to go back to the home screen or restart a new game!");
 
             // 添加两个按钮：回到主页面和重新开始
             ButtonType backToMainButton = new ButtonType("Back to the home screen");
@@ -223,7 +290,11 @@ public class GameController implements Initializable {
                     alert.close();
                     QuitToHome();
                 } else if (result.get() == restartButton) {
-                    doRestart();
+                    try {
+                        doRestart();
+                    } catch (FileNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         });

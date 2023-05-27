@@ -30,7 +30,7 @@ public class HomeController {
 
     }
 
-    public void playGame() {
+    public void playGame() throws FileNotFoundException {
         Context.INSTANCE.currentGame(new Game(15, 15, Context.INSTANCE.getCurrentUser()));
         new AdvancedStage("game.fxml")
                 .withTitle("Snake")
@@ -45,7 +45,7 @@ public class HomeController {
         //读取豆子位置
         Context.INSTANCE.currentGame().setBean(new Position(read.nextInt(), read.nextInt()));
         //读取持续时间
-        Context.INSTANCE.currentGame().setDuration(read.nextInt());
+        Context.INSTANCE.currentGame().setDuration(read.next());
         //读取分数
         Context.INSTANCE.currentGame().setScore(read.nextInt());
         //读取蛇身位置集合
