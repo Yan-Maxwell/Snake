@@ -23,6 +23,9 @@ public class HomeController {
     @FXML
     private Button Begin;
 
+    @FXML
+    private Button Load;
+
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
     }
@@ -43,17 +46,16 @@ public class HomeController {
         Context.INSTANCE.currentGame().setBean(new Position(read.nextInt(), read.nextInt()));
         //读取持续时间
         Context.INSTANCE.currentGame().setDuration(read.nextInt());
+        //读取分数
+        Context.INSTANCE.currentGame().setScore(read.nextInt());
         //读取蛇身位置集合
         while(read.hasNext()){
             Context.INSTANCE.currentGame().getSnake().getBody().add(0,new Position(read.nextInt(), read.nextInt()));
         }
 
-
-
-
         new AdvancedStage("game.fxml")
                 .withTitle("Snake")
                 .shows();
-        Begin.getScene().getWindow().hide();
+        Load.getScene().getWindow().hide();
     }
 }

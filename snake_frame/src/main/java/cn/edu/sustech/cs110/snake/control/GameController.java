@@ -20,10 +20,7 @@ import javafx.scene.input.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.*;
@@ -42,6 +39,8 @@ public class GameController implements Initializable {
 
     @FXML
     private Button btnPause;
+
+    private Button homeQuit;
 
     @FXML
     private Text textCurrentScore;
@@ -96,32 +95,42 @@ public class GameController implements Initializable {
     }
 
     public void doRestart() {
-        // TODO: add some code here
         // 取消之前的任务
         if (Objects.nonNull(gameDaemonTask)) {
             gameDaemonTask.cancel(true);
         }
         // 创建新的游戏对象
-        setupDaemonScheduler();
         Context.INSTANCE.currentGame(new Game(15, 15, Context.INSTANCE.getCurrentUser()));
-        MOVE_DURATION = 500;
         new AdvancedStage("game.fxml")
                 .withTitle("Snake")
                 .shows();
         gameStage.close();
     }
 
-    public void doRecover() {
-        // TODO: add some code here
-    }
-
-    public void doQuit() {
+    public void QuitToHome() {
         if (Objects.nonNull(gameDaemonTask)) {
             gameDaemonTask.cancel(true);
         }
         // 返回主页
         new AdvancedStage("home.fxml")
                 .withTitle("HOME")
+                .shows();
+        gameStage.close();
+    }
+
+    public void record() throws IOException {
+        File file = new File("record.txt");
+        FileWriter writer = new FileWriter(file,true);
+        writer.write(game.getPlayer() + " " + game.getScore());
+    }
+
+    public void QuitToLogin() {
+        if (Objects.nonNull(gameDaemonTask)) {
+            gameDaemonTask.cancel(true);
+        }
+        // 返回登录界面
+        new AdvancedStage("login.fxml")
+                .withTitle("Login in")
                 .shows();
         gameStage.close();
     }
@@ -138,6 +147,8 @@ public class GameController implements Initializable {
         save.println(Context.INSTANCE.currentGame().getBean().getX()+" "+Context.INSTANCE.currentGame().getBean().getY());
         //存持续时间
         save.println(Context.INSTANCE.currentGame().getDuration());
+        //存分数
+        save.println(Context.INSTANCE.currentGame().getScore());
         //存蛇身位置集合
         for (int i = Context.INSTANCE.currentGame().getSnake().getBody().size(); i > 0 ; i--) {
             save.println(Context.INSTANCE.currentGame().getSnake().getBody().get(i).getX()+" "+Context.INSTANCE.currentGame().getSnake().getBody().get(i).getY());
@@ -190,6 +201,8 @@ public class GameController implements Initializable {
     @Subscribe
     public void gameOver(GameOverEvent event) {
 
+
+
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setHeaderText("Game Over");
@@ -208,7 +221,7 @@ public class GameController implements Initializable {
             if (result.isPresent()) {
                 if (result.get() == backToMainButton) {
                     alert.close();
-                    doQuit();
+                    QuitToHome();
                 } else if (result.get() == restartButton) {
                     doRestart();
                 }

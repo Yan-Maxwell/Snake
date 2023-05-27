@@ -36,6 +36,7 @@ public class GameDaemonTask implements Runnable {
             diffs.put(headFwd, GridState.SNAKE_ON);
             Position newTail = game.getSnake().getBody().get(game.getSnake().getBody().size() - 1);
             diffs.put(newTail, GridState.SNAKE_ON);
+            game.setScore(game.getScore()+1);
             boolean coincide;
             Position newOne;
             do {
