@@ -52,7 +52,7 @@ public class GameController implements Initializable {
     @FXML
     private GameBoard board;
 
-    private static final long MOVE_DURATION = 500;
+    private long MOVE_DURATION = 500;
 
     @SuppressWarnings("AlibabaThreadPoolCreation")
     final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
@@ -60,6 +60,8 @@ public class GameController implements Initializable {
     @SuppressWarnings("java:S3077")
     volatile ScheduledFuture<?> gameDaemonTask;
     public Game game;
+    private Stage gameStage;
+
 
 
     @Override
@@ -68,6 +70,7 @@ public class GameController implements Initializable {
             if (!Context.INSTANCE.currentGame().isPlaying()) {
                 return;
             }
+            gameStage = (Stage) root.getScene().getWindow();
             // TODO: add some code here
         }, 0, 1000, TimeUnit.MILLISECONDS);
 
@@ -94,6 +97,18 @@ public class GameController implements Initializable {
 
     public void doRestart() {
         // TODO: add some code here
+        // 取消之前的任务
+        if (Objects.nonNull(gameDaemonTask)) {
+            gameDaemonTask.cancel(true);
+        }
+        // 创建新的游戏对象
+        setupDaemonScheduler();
+        Context.INSTANCE.currentGame(new Game(15, 15, Context.INSTANCE.getCurrentUser()));
+        MOVE_DURATION = 500;
+        new AdvancedStage("game.fxml")
+                .withTitle("Snake")
+                .shows();
+        gameStage.close();
     }
 
     public void doRecover() {
@@ -101,7 +116,14 @@ public class GameController implements Initializable {
     }
 
     public void doQuit() {
-        // TODO: add some code here
+        if (Objects.nonNull(gameDaemonTask)) {
+            gameDaemonTask.cancel(true);
+        }
+        // 返回主页
+        new AdvancedStage("home.fxml")
+                .withTitle("HOME")
+                .shows();
+        gameStage.close();
     }
 
     public void toggleMusic() {
@@ -120,6 +142,8 @@ public class GameController implements Initializable {
         for (int i = Context.INSTANCE.currentGame().getSnake().getBody().size(); i > 0 ; i--) {
             save.println(Context.INSTANCE.currentGame().getSnake().getBody().get(i).getX()+" "+Context.INSTANCE.currentGame().getSnake().getBody().get(i).getY());
         }
+
+        save.close();
     }
 
     public void turnLeft() {
@@ -160,7 +184,7 @@ public class GameController implements Initializable {
 
     @Subscribe
     public void beanAte(BeanAteEvent event) {
-
+        board.repaint(event.getDiff());
     }
 
     @Subscribe
@@ -183,17 +207,12 @@ public class GameController implements Initializable {
             // 根据用户选择执行相应操作
             if (result.isPresent()) {
                 if (result.get() == backToMainButton) {
-                    new AdvancedStage("home.fxml")
-                            .withTitle("HOME")
-                            .shows();
+                    alert.close();
+                    doQuit();
                 } else if (result.get() == restartButton) {
-                    Context.INSTANCE.currentGame(new Game(15, 15, Context.INSTANCE.getCurrentUser()));
-                    new AdvancedStage("game.fxml")
-                            .withTitle("Snake")
-                            .shows();
+                    doRestart();
                 }
             }
         });
     }
-
 }
