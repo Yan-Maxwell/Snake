@@ -20,7 +20,10 @@ import javafx.scene.input.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.*;
@@ -93,8 +96,18 @@ public class GameController implements Initializable {
         // TODO: add some code here
     }
 
-    public void doSave() {
+    public void doSave() throws FileNotFoundException {
         // TODO: add some code here
+        File file = new File(Context.INSTANCE.currentGame().getPlayer()+"Archive.txt");
+        PrintWriter save = new PrintWriter(file);
+        //存豆子位置
+        save.println(Context.INSTANCE.currentGame().getBean().getX()+" "+Context.INSTANCE.currentGame().getBean().getY());
+        //存持续时间
+        save.println(Context.INSTANCE.currentGame().getDuration());
+        //存蛇身位置集合
+        for (int i = Context.INSTANCE.currentGame().getSnake().getBody().size(); i > 0 ; i--) {
+            save.println(Context.INSTANCE.currentGame().getSnake().getBody().get(i).getX()+" "+Context.INSTANCE.currentGame().getSnake().getBody().get(i).getY());
+        }
     }
 
     public void doQuit() {
@@ -143,12 +156,7 @@ public class GameController implements Initializable {
 
 //    @Subscribe
 //    public void beanAte(BeanAteEvent event) {
-//        Position headFwd = game.getSnake().getBody().get(0).toward(game.getSnake().getDirection());
-//        board.repaint(event.getDiff());
-//        Position prep =game.getSnake().getBody().get(game.getSnake().getBody().size()-1);
-//        game.getSnake().getBody().add(prep);
-//        Map<Position, GridState> diffs = new HashMap<>(3);
-//        diffs.put(prep,GridState.SNAKE_ON);
+//
 //    }
 
     @Subscribe
