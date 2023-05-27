@@ -10,12 +10,14 @@ public class Game {
     private final Snake snake;
     public static Position bean;
     private int duration;
+    private int score;
     private boolean playing;
 
     public Game(int row, int col, String str) {
         this.row = row;
         this.col = col;
         this.player = str;
+        this.setScore(0);
         this.snake = new Snake(Direction.random());
         this.snake.getBody().add(new Position(row / 2, col / 2));
         this.bean = new Position(Context.INSTANCE.random().nextInt(row), Context.INSTANCE.random().nextInt(col));
@@ -68,5 +70,13 @@ public class Game {
     @Override
     public java.lang.String toString() {
         return "Game(row=" + this.getRow() + ", col=" + this.getCol() + ", snake=" + this.getSnake() + ", bean=" + this.getBean() + ", duration=" + this.getDuration() + ", playing=" + this.isPlaying() + ")";
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
     }
 }
