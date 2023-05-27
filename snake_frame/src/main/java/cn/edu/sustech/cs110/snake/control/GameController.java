@@ -27,6 +27,10 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.*;
+import java.io.IOException;
+import java.net.URL;
+import java.util.*;
+import java.util.concurrent.*;
 
 public class GameController implements Initializable {
 
@@ -96,6 +100,14 @@ public class GameController implements Initializable {
         // TODO: add some code here
     }
 
+    public void doQuit() {
+        // TODO: add some code here
+    }
+
+    public void toggleMusic() {
+        // TODO: add some code here
+    }
+
     public void doSave() throws FileNotFoundException {
         // TODO: add some code here
         File file = new File(Context.INSTANCE.currentGame().getPlayer()+"Archive.txt");
@@ -108,14 +120,6 @@ public class GameController implements Initializable {
         for (int i = Context.INSTANCE.currentGame().getSnake().getBody().size(); i > 0 ; i--) {
             save.println(Context.INSTANCE.currentGame().getSnake().getBody().get(i).getX()+" "+Context.INSTANCE.currentGame().getSnake().getBody().get(i).getY());
         }
-    }
-
-    public void doQuit() {
-        // TODO: add some code here
-    }
-
-    public void toggleMusic() {
-        // TODO: add some code here
     }
 
     public void turnLeft() {
@@ -154,17 +158,42 @@ public class GameController implements Initializable {
         board.repaint(event.getDiff());
     }
 
-//    @Subscribe
-//    public void beanAte(BeanAteEvent event) {
-//
-//    }
+    @Subscribe
+    public void beanAte(BeanAteEvent event) {
+
+    }
 
     @Subscribe
     public void gameOver(GameOverEvent event) {
-        Context.INSTANCE.currentGame().setPlaying(false);
 
-        // TODO: add some code here
-        System.out.println("Game over");
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setHeaderText("Game Over");
+            alert.setContentText("Game Over！Please choose to go back to the home screen or restart a new game!");
+
+            // 添加两个按钮：回到主页面和重新开始
+            ButtonType backToMainButton = new ButtonType("Back to the home screen");
+            ButtonType restartButton = new ButtonType("Restart");
+
+            alert.getButtonTypes().setAll(backToMainButton, restartButton);
+
+            // 显示弹窗并等待用户选择
+            Optional<ButtonType> result = alert.showAndWait();
+
+            // 根据用户选择执行相应操作
+            if (result.isPresent()) {
+                if (result.get() == backToMainButton) {
+                    new AdvancedStage("home.fxml")
+                            .withTitle("HOME")
+                            .shows();
+                } else if (result.get() == restartButton) {
+                    Context.INSTANCE.currentGame(new Game(15, 15, Context.INSTANCE.getCurrentUser()));
+                    new AdvancedStage("game.fxml")
+                            .withTitle("Snake")
+                            .shows();
+                }
+            }
+        });
     }
 
 }
