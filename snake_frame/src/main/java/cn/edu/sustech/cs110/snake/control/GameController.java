@@ -54,6 +54,8 @@ public class GameController implements Initializable {
 
     @FXML
     private Text textPlayerName;
+    @FXML
+    private Text textPlayerHighest;
 
     private long startTime; // 记录游戏开始时间
     private long elapsedTime; // 记录游戏已经过去的时间
@@ -195,6 +197,10 @@ public class GameController implements Initializable {
             }
         }
         save.println(highest);
+        //存地图
+        save.println(Context.INSTANCE.currentGame().getMap());
+        //存难度
+        save.println(Context.INSTANCE.currentGame().getDifficulty());
         //存蛇身位置集合
         for (int i = Context.INSTANCE.currentGame().getSnake().getBody().size()-1; i > 0 ; i--) {
             save.println(Context.INSTANCE.currentGame().getSnake().getBody().get(i).getX()+" "+Context.INSTANCE.currentGame().getSnake().getBody().get(i).getY());
@@ -255,8 +261,8 @@ public class GameController implements Initializable {
         long milliseconds = elapsedTime % 1000;
 
         Platform.runLater(() -> {
-            textTimeAlive.setText("Time alive: "+String.format("%02d : %02d : %03d", minutes, seconds, milliseconds)+" s");
-            Context.INSTANCE.currentGame().setDuration(String.format("%02d : %02d : %03d", minutes, seconds, milliseconds));
+            textTimeAlive.setText("Time alive: "+String.format("%02d:%02d:%03d", minutes, seconds, milliseconds)+" s");
+            Context.INSTANCE.currentGame().setDuration(String.format("%02d:%02d:%03d", minutes, seconds, milliseconds));
         });
     }
 
@@ -281,6 +287,7 @@ public class GameController implements Initializable {
         );
 
         textPlayerName.setText("Player: "+Context.INSTANCE.getCurrentUser());
+        textPlayerHighest.setText("History highest:"+Context.INSTANCE.currentGame().getHighestScore());
     }
 
     @Subscribe

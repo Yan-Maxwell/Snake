@@ -27,6 +27,7 @@ public class Game {
         this.col = col;
         this.player = str;
         this.setScore(0);
+        this.setHighestScore(0);
         this.snake = new Snake(Direction.random());
         this.snake.getBody().add(new Position(row / 2, col / 2));
         this.bean = new Position(Context.INSTANCE.random().nextInt(row), Context.INSTANCE.random().nextInt(col));
@@ -38,6 +39,7 @@ public class Game {
         this.col = col;
         this.player = str;
         this.setScore(0);
+        this.setHighestScore(0);
         this.snake = new Snake(Direction.random());
         this.snake.getBody().add(new Position(row / 2, col / 2));
         this.bean = new Position(Context.INSTANCE.random().nextInt(row), Context.INSTANCE.random().nextInt(col));
