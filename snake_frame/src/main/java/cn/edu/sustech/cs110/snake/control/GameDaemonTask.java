@@ -28,6 +28,10 @@ public class GameDaemonTask implements Runnable {
         Position headFwd = game.getSnake().getBody().get(0).toward(game.getSnake().getDirection());
 
         Map<Position, GridState> diffs = new HashMap<>(3);
+        for(int i =0; i<Context.INSTANCE.currentGame().getWall().getWall().size(); i++){
+            diffs.put(game.getWall().getWall().get(i), GridState.WALL);
+        }
+        int oneScore = Context.INSTANCE.currentGame().getDifficulty();
 
 
         //吃豆并生成
@@ -36,7 +40,7 @@ public class GameDaemonTask implements Runnable {
             diffs.put(headFwd, GridState.SNAKE_ON);
             Position newTail = game.getSnake().getBody().get(game.getSnake().getBody().size() - 1);
             diffs.put(newTail, GridState.SNAKE_ON);
-            game.setScore(game.getScore()+1);
+            game.setScore(game.getScore()+oneScore);
             boolean coincide;
             Position newOne;
             do {
@@ -44,8 +48,12 @@ public class GameDaemonTask implements Runnable {
                 newOne = new Position(Context.INSTANCE.random().nextInt(game.getRow()), Context.INSTANCE.random().nextInt(game.getCol()));
                 for (int i = 0; i < game.getSnake().getBody().size(); i++) {
                     if (newOne.equals(game.getSnake().getBody().get(i))) {
-                        coincide = true;
-                        break;
+                        for (int j = 0; j < game.getWall().getWall().size(); j++) {
+                            if (newOne.equals(game.getWall().getWall().get(j))) {
+                                coincide = true;
+                                break;
+                            }
+                        }
                     }
                 }
             }while (coincide);
@@ -58,6 +66,14 @@ public class GameDaemonTask implements Runnable {
             Context.INSTANCE.eventBus().post(new GameOverEvent());
             game.setPlaying(false);
         }
+        else if (game.getSnake().getBody().contains(headFwd)) {
+            Context.INSTANCE.eventBus().post(new GameOverEvent());
+            game.setPlaying(false);
+        }
+        else if (game.getWall().getWall().contains(headFwd)) {
+            Context.INSTANCE.eventBus().post(new GameOverEvent());
+            game.setPlaying(false);
+        }
         //没吃豆继续跑
         else {
             game.getSnake().getBody().add(0, headFwd);
@@ -65,13 +81,6 @@ public class GameDaemonTask implements Runnable {
             diffs.put(game.getSnake().getBody().get(game.getSnake().getBody().size() - 1), GridState.EMPTY);
             game.getSnake().getBody().remove(game.getSnake().getBody().size() - 1);
             Context.INSTANCE.eventBus().post(new BoardRerenderEvent(diffs));
-        }
-        //头撞到身体则Game Over
-        for (int i = 1; i < game.getSnake().getBody().size(); i++) {
-            if(headFwd.equals(game.getSnake().getBody().get(i))) {
-                Context.INSTANCE.eventBus().post(new GameOverEvent());
-                game.setPlaying(false);
-            }
         }
 
         Context.INSTANCE.eventBus().post(new BoardRerenderEvent(diffs));

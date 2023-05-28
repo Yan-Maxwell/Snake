@@ -15,6 +15,8 @@ public class GameBoard extends GridPane {
 
     private static final Color BEAN_COLOR = Color.RED;
 
+    private static final Color WALL_COLOR = Color.BROWN;
+
     private static final Color BACKGROUND_COLOR = Color.LIGHTYELLOW;
 
     private Rectangle[][] grids;
@@ -51,6 +53,7 @@ public class GameBoard extends GridPane {
                 add(wrapper, j, i);
             }
         }
+        game.getWall().getWall().forEach(position -> grids[position.getX()][position.getY()].setFill(WALL_COLOR));
         grids[game.getBean().getX()][game.getBean().getY()].setFill(BEAN_COLOR);
         game.getSnake().getBody().forEach(pos -> grids[pos.getX()][pos.getY()].setFill(SNAKE_COLOR));
     }
@@ -65,6 +68,8 @@ public class GameBoard extends GridPane {
                 case BEAN_ON:
                     color = BEAN_COLOR;
                     break;
+                case WALL:
+                    color = WALL_COLOR;
                 default:
                     color = BACKGROUND_COLOR;
             }

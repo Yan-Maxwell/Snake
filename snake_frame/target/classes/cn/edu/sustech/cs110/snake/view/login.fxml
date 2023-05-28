@@ -20,7 +20,7 @@
       </font></Label>
     <PasswordField fx:id="passwordField" />
    <AnchorPane prefHeight="200.0" prefWidth="200.0">
-      <children>
+       <children>
           <Button fx:id="login" contentDisplay="CENTER" layoutX="105.0" layoutY="31.0" onAction="#login" text="Login" textAlignment="CENTER" textOverrun="WORD_ELLIPSIS">
             <font>
                <Font name="Avenir Next Bold" size="22.0" />

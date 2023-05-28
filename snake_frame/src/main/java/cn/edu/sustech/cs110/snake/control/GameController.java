@@ -6,6 +6,7 @@ import cn.edu.sustech.cs110.snake.enums.GridState;
 import cn.edu.sustech.cs110.snake.events.*;
 import cn.edu.sustech.cs110.snake.model.Game;
 import cn.edu.sustech.cs110.snake.model.Position;
+import cn.edu.sustech.cs110.snake.model.Rank;
 import cn.edu.sustech.cs110.snake.view.AdvancedStage;
 import cn.edu.sustech.cs110.snake.view.components.GameBoard;
 import com.google.common.eventbus.Subscribe;
@@ -58,7 +59,7 @@ public class GameController implements Initializable {
     private long elapsedTime; // 记录游戏已经过去的时间
     private Timer timer; // 用于定时更新游戏时间
 
-    private long MOVE_DURATION = 500;
+    private long MOVE_DURATION;
 
     @SuppressWarnings("AlibabaThreadPoolCreation")
     final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
@@ -112,7 +113,7 @@ public class GameController implements Initializable {
             gameDaemonTask.cancel(true);
         }
         // 创建新的游戏对象
-        Context.INSTANCE.currentGame(new Game(25, 25, Context.INSTANCE.getCurrentUser()));
+        Context.INSTANCE.currentGame(new Game(25, 25, Context.INSTANCE.getCurrentUser(),Context.INSTANCE.currentGame().getDifficulty(), Context.INSTANCE.currentGame().getMap()));
         stopTimer();
         elapsedTime = 0;
         new AdvancedStage("game.fxml")
@@ -137,6 +138,15 @@ public class GameController implements Initializable {
         PrintWriter pw = new PrintWriter(new FileWriter(file,true));
         pw.println(Context.INSTANCE.currentGame().getPlayer()+" "+Context.INSTANCE.currentGame().getScore());
         pw.close();
+
+        File file2 = new File("rank.txt");
+        Scanner read = new Scanner(file2);
+        Rank.s1=read.next();
+        Rank.i1= read.nextInt();
+        Rank.s2=read.next();
+        Rank.i2=read.nextInt();
+        Rank.s3=read.next();
+        Rank.i3=read.nextInt();
     }
 
     private void updateScoreLabel() {
@@ -163,7 +173,6 @@ public class GameController implements Initializable {
     }
 
     public void doSave() throws IOException {
-        // TODO: add some code here
         File file = new File(Context.INSTANCE.currentGame().getPlayer()+"Archive.txt");
         PrintWriter save = new PrintWriter(file);
         //存豆子位置
@@ -172,6 +181,20 @@ public class GameController implements Initializable {
         save.println(Context.INSTANCE.currentGame().getDuration());
         //存分数
         save.println(Context.INSTANCE.currentGame().getScore());
+        //存个人最高分
+        File file2 = new File("rank.txt");
+        Scanner read = new Scanner(file2);
+        int highest = 0;
+        while(read.hasNext()){
+            if(read.next().equals(Context.INSTANCE.currentGame().getPlayer())){
+                int test = read.nextInt();
+                if (highest<test){
+                    highest=test;
+                }
+
+            }
+        }
+        save.println(highest);
         //存蛇身位置集合
         for (int i = Context.INSTANCE.currentGame().getSnake().getBody().size()-1; i > 0 ; i--) {
             save.println(Context.INSTANCE.currentGame().getSnake().getBody().get(i).getX()+" "+Context.INSTANCE.currentGame().getSnake().getBody().get(i).getY());
@@ -196,10 +219,6 @@ public class GameController implements Initializable {
 
     public void turnDown() {
         Context.INSTANCE.currentGame().getSnake().setDirection(Direction.DOWN);
-    }
-
-    public void changeDifficulty() {
-        setupDaemonScheduler();
     }
 
     private void startTimer() {
@@ -236,12 +255,22 @@ public class GameController implements Initializable {
         long milliseconds = elapsedTime % 1000;
 
         Platform.runLater(() -> {
-            textTimeAlive.setText("Time alive: "+String.format("%02d:%02d:%03d", minutes, seconds, milliseconds)+"s");
-            Context.INSTANCE.currentGame().setDuration(String.format("%02d:%02d:%03d", minutes, seconds, milliseconds));
+            textTimeAlive.setText("Time alive: "+String.format("%02d : %02d : %03d", minutes, seconds, milliseconds)+" s");
+            Context.INSTANCE.currentGame().setDuration(String.format("%02d : %02d : %03d", minutes, seconds, milliseconds));
         });
     }
 
     private void setupDaemonScheduler() {
+        int difficulty = Context.INSTANCE.currentGame().getDifficulty();
+
+        if(difficulty==1){
+            this.MOVE_DURATION=500;
+        } else if (difficulty==2) {
+            this.MOVE_DURATION=350;
+        }
+        else{
+            this.MOVE_DURATION=200;
+        }
         if (Objects.nonNull(gameDaemonTask)) {
             gameDaemonTask.cancel(true);
         }
@@ -272,7 +301,7 @@ public class GameController implements Initializable {
 
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setHeaderText("GAME OVER!\n"+"\n"+"Player: "+Context.INSTANCE.getCurrentUser()+"\n"+"Your score: "+Context.INSTANCE.currentGame().getScore()+"\n"+"Time alive: "+Context.INSTANCE.currentGame().getDuration()+"s");
+            alert.setHeaderText("GAME OVER!\n"+"\n"+"Player: "+Context.INSTANCE.getCurrentUser()+"\n"+"Your score: "+Context.INSTANCE.currentGame().getScore()+"\n"+"Time alive: "+Context.INSTANCE.currentGame().getDuration()+" s");
             alert.setContentText("Please choose to go back to the home screen or restart a new game!");
 
             // 添加两个按钮：回到主页面和重新开始

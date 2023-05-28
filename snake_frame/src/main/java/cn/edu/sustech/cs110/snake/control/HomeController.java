@@ -31,15 +31,15 @@ public class HomeController {
     }
 
     public void playGame() throws FileNotFoundException {
-        Context.INSTANCE.currentGame(new Game(15, 15, Context.INSTANCE.getCurrentUser()));
-        new AdvancedStage("game.fxml")
-                .withTitle("Snake")
+        Context.INSTANCE.currentGame(new Game(25, 25, Context.INSTANCE.getCurrentUser()));
+        new AdvancedStage("choose.fxml")
+                .withTitle("Choose your game")
                 .shows();
         Begin.getScene().getWindow().hide();
     }
 
     public void loadGame() throws FileNotFoundException {
-        Context.INSTANCE.currentGame(new Game(15, 15, Context.INSTANCE.getCurrentUser()));
+        Context.INSTANCE.currentGame(new Game(25, 25, Context.INSTANCE.getCurrentUser()));
         File file = new File(Context.INSTANCE.getCurrentUser()+"Archive.txt");
         Scanner read = new Scanner(file);
         //读取豆子位置
@@ -48,6 +48,8 @@ public class HomeController {
         Context.INSTANCE.currentGame().setDuration(read.next());
         //读取分数
         Context.INSTANCE.currentGame().setScore(read.nextInt());
+        //读取该玩家最高分
+        Context.INSTANCE.currentGame().setHighestScore(read.nextInt());
         //读取蛇身位置集合
         while(read.hasNext()){
             Context.INSTANCE.currentGame().getSnake().getBody().add(0,new Position(read.nextInt(), read.nextInt()));

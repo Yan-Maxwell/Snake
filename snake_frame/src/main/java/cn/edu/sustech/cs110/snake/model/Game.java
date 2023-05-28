@@ -5,6 +5,7 @@ import cn.edu.sustech.cs110.snake.enums.Direction;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.*;
 
 public class Game {
@@ -12,14 +13,16 @@ public class Game {
     private final int row;
     private final int col;
     private final Snake snake;
+    private Wall wall;
     public static Position bean;
     private String duration;
     private int score;
+    private int highestScore;
     private boolean playing;
-    private String[] p;
-    private int[] s;
+    private int difficulty;
+    private int map;
 
-    public Game(int row, int col, String str) throws FileNotFoundException {
+    public Game(int row, int col, String str) {
         this.row = row;
         this.col = col;
         this.player = str;
@@ -27,41 +30,20 @@ public class Game {
         this.snake = new Snake(Direction.random());
         this.snake.getBody().add(new Position(row / 2, col / 2));
         this.bean = new Position(Context.INSTANCE.random().nextInt(row), Context.INSTANCE.random().nextInt(col));
-        Map<String, Integer> rank = new HashMap<>();
-        File file = new File("records.txt");
-        Scanner read = new Scanner(file);
-        //记录每个玩家及其最高分
-        while (read.hasNext()){
-            String temp1 = read.next();
-            int temp2 = read.nextInt();
-            if (!rank.containsKey(temp1)){
-                rank.put(temp1,temp2);
-            } else if (temp2>rank.get(temp1)) {
-                rank.put(temp1,temp2);
-            }
-        }
-
-        int max = 0;
-        //更新排行榜
-//        for(int i=0;i<2;i++){
-//            Collection<Integer> c = rank.values();
-//            Object[] obj = c.toArray();
-//            Arrays.sort(obj);
-//            s[i] = (int) obj[rank.size()-1];
-//            p[i] = getKey(rank,s[i]);
-//        }
-
+        this.wall = new Wall();
     }
 
-    public String getKey(Map map,int n){
-        Iterator<Object> it = map.keySet().iterator();
-        while (it.hasNext()){
-            String key = it.next().toString();
-            if(map.get(key).equals(n)){
-                return key;
-            }
-        }
-        return null;
+    public Game(int row, int col, String str,int difficulty, int map) {
+        this.row = row;
+        this.col = col;
+        this.player = str;
+        this.setScore(0);
+        this.snake = new Snake(Direction.random());
+        this.snake.getBody().add(new Position(row / 2, col / 2));
+        this.bean = new Position(Context.INSTANCE.random().nextInt(row), Context.INSTANCE.random().nextInt(col));
+        this.difficulty = difficulty;
+        this.map = map;
+        this.wall = new Wall(map);
     }
 
     public void setBean(final Position bean) {
@@ -122,4 +104,35 @@ public class Game {
     }
 
 
+    public int getHighestScore() {
+        return highestScore;
+    }
+
+    public void setHighestScore(int highestScore) {
+        this.highestScore = highestScore;
+    }
+
+    public Wall getWall() {
+        return wall;
+    }
+
+    public void setWall(Wall wall) {
+        this.wall = wall;
+    }
+
+    public int getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(int difficulty) {
+        this.difficulty = difficulty;
+    }
+
+    public int getMap() {
+        return map;
+    }
+
+    public void setMap(int map) {
+        this.map = map;
+    }
 }

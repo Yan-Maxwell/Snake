@@ -1,2 +1,7 @@
 yan 10
-1 1
+yan 2
+yan 6
+yan 6
+yan 0
+yan 0
+yan 0
