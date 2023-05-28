@@ -2,15 +2,14 @@ package cn.edu.sustech.cs110.snake.control;
 
 import cn.edu.sustech.cs110.snake.Context;
 import cn.edu.sustech.cs110.snake.enums.Direction;
-import cn.edu.sustech.cs110.snake.enums.GridState;
 import cn.edu.sustech.cs110.snake.events.*;
 import cn.edu.sustech.cs110.snake.model.Game;
+import cn.edu.sustech.cs110.snake.model.Position;
 import cn.edu.sustech.cs110.snake.view.AdvancedStage;
 import cn.edu.sustech.cs110.snake.view.components.GameBoard;
 import com.google.common.eventbus.Subscribe;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -24,9 +23,6 @@ import java.net.URL;
 import java.util.*;
 import java.util.concurrent.*;
 import java.io.IOException;
-import java.net.URL;
-import java.util.*;
-import java.util.concurrent.*;
 
 public class GameController implements Initializable {
 
@@ -78,7 +74,6 @@ public class GameController implements Initializable {
                 return;
             }
             gameStage = (Stage) root.getScene().getWindow();
-            // TODO: add some code here
         }, 0, 1000, TimeUnit.MILLISECONDS);
 
         setupDaemonScheduler();
@@ -113,6 +108,22 @@ public class GameController implements Initializable {
         }
         // 创建新的游戏对象
         Context.INSTANCE.currentGame(new Game(25, 25, Context.INSTANCE.getCurrentUser(),Context.INSTANCE.currentGame().getDifficulty(), Context.INSTANCE.currentGame().getMap()));
+        File file = new File(Context.INSTANCE.getCurrentUser()+"Archive.txt");
+        if(file.exists()){
+            Scanner read = new Scanner(file);
+            read.next();
+            read.next();
+            read.next();
+            read.next();
+            Context.INSTANCE.currentGame().setHighestScore(read.nextInt());
+        }
+        Game game =Context.INSTANCE.currentGame();
+        for (int j = 0; j < game.getWall().getThisWall().size(); j++) {
+            if (game.getBean().equals(game.getWall().getThisWall().get(j))) {
+                game.setBean(new Position(Context.INSTANCE.random().nextInt(game.getRow()), Context.INSTANCE.random().nextInt(game.getCol())));
+                break;
+            }
+        }
         stopTimer();
         elapsedTime = 0;
         new AdvancedStage("game.fxml")
@@ -132,6 +143,17 @@ public class GameController implements Initializable {
         gameStage.close();
     }
 
+    public void QuitToLogin() {
+        if (Objects.nonNull(gameDaemonTask)) {
+            gameDaemonTask.cancel(true);
+        }
+        // 返回登录界面
+        new AdvancedStage("login.fxml")
+                .withTitle("Login in")
+                .shows();
+        gameStage.close();
+    }
+
     public void record() throws IOException {
         File file = new File("records.txt");
         PrintWriter pw = new PrintWriter(new FileWriter(file,true));
@@ -146,21 +168,7 @@ public class GameController implements Initializable {
             Context.INSTANCE.currentGame().setScore(score);
         });
     }
-
-    public void QuitToLogin() {
-        if (Objects.nonNull(gameDaemonTask)) {
-            gameDaemonTask.cancel(true);
-        }
-        // 返回登录界面
-        new AdvancedStage("login.fxml")
-                .withTitle("Login in")
-                .shows();
-        gameStage.close();
-    }
-
-    public void toggleMusic() {
-        // TODO: add some code here
-    }
+    
 
     public void doSave() throws IOException {
         File file = new File(Context.INSTANCE.currentGame().getPlayer()+"Archive.txt");
@@ -193,8 +201,6 @@ public class GameController implements Initializable {
         for (int i = Context.INSTANCE.currentGame().getSnake().getBody().size()-1; i > 0 ; i--) {
             save.println(Context.INSTANCE.currentGame().getSnake().getBody().get(i).getX()+" "+Context.INSTANCE.currentGame().getSnake().getBody().get(i).getY());
         }
-        //存本次游戏记录
-        record();
 
         save.close();
     }

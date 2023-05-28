@@ -7,13 +7,11 @@ import cn.edu.sustech.cs110.snake.events.BoardRerenderEvent;
 import cn.edu.sustech.cs110.snake.events.GameOverEvent;
 import cn.edu.sustech.cs110.snake.model.Game;
 import cn.edu.sustech.cs110.snake.model.Position;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
+
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+
 
 public class GameDaemonTask implements Runnable {
 
@@ -48,8 +46,8 @@ public class GameDaemonTask implements Runnable {
                 newOne = new Position(Context.INSTANCE.random().nextInt(game.getRow()), Context.INSTANCE.random().nextInt(game.getCol()));
                 for (int i = 0; i < game.getSnake().getBody().size(); i++) {
                     if (newOne.equals(game.getSnake().getBody().get(i))) {
-                        for (int j = 0; j < game.getWall().getWall().size(); j++) {
-                            if (newOne.equals(game.getWall().getWall().get(j))) {
+                        for (int j = 0; j < game.getWall().getThisWall().size(); j++) {
+                            if (newOne.equals(game.getWall().getThisWall().get(j))) {
                                 coincide = true;
                                 break;
                             }
@@ -83,6 +81,5 @@ public class GameDaemonTask implements Runnable {
             Context.INSTANCE.eventBus().post(new BoardRerenderEvent(diffs));
         }
 
-        Context.INSTANCE.eventBus().post(new BoardRerenderEvent(diffs));
     }
 }

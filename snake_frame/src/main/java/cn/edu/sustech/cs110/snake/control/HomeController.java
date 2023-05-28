@@ -12,10 +12,7 @@ import javafx.scene.control.ButtonType;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Optional;
-import java.util.ResourceBundle;
-import java.net.URL;
 import java.util.Scanner;
 
 public class HomeController {
@@ -32,7 +29,6 @@ public class HomeController {
 
     public void playGame() throws FileNotFoundException {
         Context.INSTANCE.currentGame(new Game(25, 25, Context.INSTANCE.getCurrentUser()));
-        //读取该玩家最高分
         File file = new File(Context.INSTANCE.getCurrentUser()+"Archive.txt");
         if(file.exists()){
             Scanner read = new Scanner(file);
@@ -41,6 +37,13 @@ public class HomeController {
             read.next();
             read.next();
             Context.INSTANCE.currentGame().setHighestScore(read.nextInt());
+        }
+        Game game =Context.INSTANCE.currentGame();
+        for (int j = 0; j < game.getWall().getThisWall().size(); j++) {
+            if (game.getBean().equals(game.getWall().getThisWall().get(j))) {
+                game.setBean(new Position(Context.INSTANCE.random().nextInt(game.getRow()), Context.INSTANCE.random().nextInt(game.getCol())));
+                break;
+            }
         }
 
         new AdvancedStage("choose.fxml")
@@ -97,8 +100,18 @@ public class HomeController {
         int[] nbScore=new int[3];
         int i=0;
         while (i<3 && read.hasNext()) {
-            nbPlayer[i]=read.next();
-            nbScore[i]=read.nextInt();
+            String temp=read.next();
+            boolean mark=true;
+            for(int y=0;y<i;y++){
+                if (temp.equals(nbPlayer[y])) {
+                    mark = false;
+                    break;
+                }
+            }
+            if (mark){
+                nbPlayer[i]=temp;
+                nbScore[i]=read.nextInt();
+            }else {read.nextInt();}
             i++;
         }
 
