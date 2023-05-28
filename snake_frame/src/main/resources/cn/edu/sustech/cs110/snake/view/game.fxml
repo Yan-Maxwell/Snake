@@ -25,7 +25,7 @@
             <MenuItem mnemonicParsing="false" onAction="#QuitToLogin" text="Quit to login page" />
             <MenuItem fx:id="homeQuit" mnemonicParsing="false" onAction="#QuitToHome" text="Quit to home page" />
          <SeparatorMenuItem mnemonicParsing="false" />
-            <CheckMenuItem fx:id="menuMusic" mnemonicParsing="false" onAction="#toggleMusic" text="Music" />
+            <CheckMenuItem mnemonicParsing="false" onAction="#toggleMusic" text="Music" />
         </Menu>
     </MenuBar>
     <SplitPane dividerPositions="0.7" prefHeight="160.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
