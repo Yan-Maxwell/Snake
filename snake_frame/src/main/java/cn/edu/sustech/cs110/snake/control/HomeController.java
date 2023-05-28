@@ -1,6 +1,5 @@
 package cn.edu.sustech.cs110.snake.control;
 
-import cn.edu.sustech.cs110.snake.enums.Direction;
 import cn.edu.sustech.cs110.snake.model.Game;
 import cn.edu.sustech.cs110.snake.model.Position;
 import cn.edu.sustech.cs110.snake.view.AdvancedStage;
@@ -28,10 +27,8 @@ public class HomeController {
 
     @FXML
     private Button Load;
-
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-
-    }
+    @FXML
+    private Button ShowRank;
 
     public void playGame() throws FileNotFoundException {
         Context.INSTANCE.currentGame(new Game(25, 25, Context.INSTANCE.getCurrentUser()));
@@ -91,5 +88,26 @@ public class HomeController {
                 .withTitle("Snake")
                 .shows();
         Load.getScene().getWindow().hide();
+    }
+
+    public void showranking() throws FileNotFoundException {
+        File file=new File("rank.txt");
+        Scanner read=new Scanner(file);
+        String[] nbPlayer=new String[3];
+        int[] nbScore=new int[3];
+        int i=0;
+        while (i<3 && read.hasNext()) {
+            nbPlayer[i]=read.next();
+            nbScore[i]=read.nextInt();
+            i++;
+        }
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("RANK");
+        alert.setHeaderText(null);
+        alert.setContentText("1st: " +nbPlayer[0]+ "   " +nbScore[0]+ "points" + "\n" + "2nd: " +nbPlayer[1]+ "   " +nbScore[1]+ "points" + "\n" + "3rd: " +nbPlayer[2]+ "   " +nbScore[2]+ "points" + "\n");
+        ButtonType backButton = new ButtonType("Back");
+        alert.getButtonTypes().setAll(backButton);
+        Optional<ButtonType> result = alert.showAndWait();
     }
 }

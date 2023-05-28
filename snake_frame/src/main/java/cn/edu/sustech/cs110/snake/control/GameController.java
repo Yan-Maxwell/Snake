@@ -5,8 +5,6 @@ import cn.edu.sustech.cs110.snake.enums.Direction;
 import cn.edu.sustech.cs110.snake.enums.GridState;
 import cn.edu.sustech.cs110.snake.events.*;
 import cn.edu.sustech.cs110.snake.model.Game;
-import cn.edu.sustech.cs110.snake.model.Position;
-import cn.edu.sustech.cs110.snake.model.Rank;
 import cn.edu.sustech.cs110.snake.view.AdvancedStage;
 import cn.edu.sustech.cs110.snake.view.components.GameBoard;
 import com.google.common.eventbus.Subscribe;
@@ -100,7 +98,6 @@ public class GameController implements Initializable {
     }
 
     public void togglePause() {
-        // TODO: change the text in menu's pause item and button
         Context.INSTANCE.currentGame().setPlaying(!Context.INSTANCE.currentGame().isPlaying());
         if (Context.INSTANCE.currentGame().isPlaying()) {
             startTimer();
@@ -140,15 +137,6 @@ public class GameController implements Initializable {
         PrintWriter pw = new PrintWriter(new FileWriter(file,true));
         pw.println(Context.INSTANCE.currentGame().getPlayer()+" "+Context.INSTANCE.currentGame().getScore());
         pw.close();
-
-        File file2 = new File("rank.txt");
-        Scanner read = new Scanner(file2);
-        Rank.s1=read.next();
-        Rank.i1= read.nextInt();
-        Rank.s2=read.next();
-        Rank.i2=read.nextInt();
-        Rank.s3=read.next();
-        Rank.i3=read.nextInt();
     }
 
     private void updateScoreLabel() {
