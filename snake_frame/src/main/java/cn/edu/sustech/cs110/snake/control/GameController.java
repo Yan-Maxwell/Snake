@@ -112,7 +112,7 @@ public class GameController implements Initializable {
             gameDaemonTask.cancel(true);
         }
         // 创建新的游戏对象
-        Context.INSTANCE.currentGame(new Game(15, 15, Context.INSTANCE.getCurrentUser()));
+        Context.INSTANCE.currentGame(new Game(25, 25, Context.INSTANCE.getCurrentUser()));
         stopTimer();
         elapsedTime = 0;
         new AdvancedStage("game.fxml")
@@ -133,10 +133,10 @@ public class GameController implements Initializable {
     }
 
     public void record() throws IOException {
-//        File file = new File("records.txt");
-//        FileWriter writer = new FileWriter(file,true);
-//        writer.write(game.getPlayer() + " " + game.getScore()+" ");
-//        writer.close();
+        File file = new File("records.txt");
+        PrintWriter pw = new PrintWriter(new FileWriter(file,true));
+        pw.println(Context.INSTANCE.currentGame().getPlayer()+" "+Context.INSTANCE.currentGame().getScore());
+        pw.close();
     }
 
     private void updateScoreLabel() {
