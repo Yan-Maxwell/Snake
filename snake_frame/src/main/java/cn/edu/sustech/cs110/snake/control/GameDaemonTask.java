@@ -54,7 +54,7 @@ public class GameDaemonTask implements Runnable {
             Context.INSTANCE.eventBus().post(new BeanAteEvent(diffs));
         }
         //撞墙则Game Over
-        else if (headFwd.getX() < 0 || headFwd.getX() > game.getRow() || headFwd.getY() < 0 || headFwd.getY() > game.getCol()) {
+        else if (headFwd.getX() < 0 || headFwd.getX() > game.getRow()-1|| headFwd.getY() < 0 || headFwd.getY() > game.getCol()-1) {
             Context.INSTANCE.eventBus().post(new GameOverEvent());
             game.setPlaying(false);
         }
