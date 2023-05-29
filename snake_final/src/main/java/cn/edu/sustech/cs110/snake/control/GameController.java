@@ -51,9 +51,9 @@ public class GameController implements Initializable {
     @FXML
     private Text textPlayerHighest;
 
-    private long startTime; // 记录游戏开始时间
-    private long elapsedTime; // 记录游戏已经过去的时间
-    private Timer timer; // 用于定时更新游戏时间
+    private long startTime;
+    private long elapsedTime;
+    private Timer timer;
 
     private long MOVE_DURATION;
 
@@ -76,10 +76,23 @@ public class GameController implements Initializable {
             gameStage = (Stage) root.getScene().getWindow();
         }, 0, 1000, TimeUnit.MILLISECONDS);
 
+        elapsedTime = convertDurationToMilliseconds(Context.INSTANCE.currentGame().getDuration());
+
         setupDaemonScheduler();
+        textTimeAlive.setText("Time alive: "+Context.INSTANCE.currentGame().getDuration()+" s");
+        textCurrentScore.setText("Current score: "+Context.INSTANCE.currentGame().getScore());
 
         Platform.runLater(this::bindAccelerators);
         board.paint(Context.INSTANCE.currentGame());
+    }
+
+    private long convertDurationToMilliseconds(String duration) {
+        String[] timeParts = duration.split(":");
+        long minutes = Long.parseLong(timeParts[0]);
+        long seconds = Long.parseLong(timeParts[1]);
+        long milliseconds = Long.parseLong(timeParts[2]);
+
+        return (minutes * 60 + seconds) * 1000 + milliseconds;
     }
 
     private void bindAccelerators() {
@@ -117,13 +130,14 @@ public class GameController implements Initializable {
             read.next();
             Context.INSTANCE.currentGame().setHighestScore(read.nextInt());
         }
+
         Game game =Context.INSTANCE.currentGame();
-        for (int j = 0; j < game.getWall().getThisWall().size(); j++) {
-            if (game.getBean().equals(game.getWall().getThisWall().get(j))) {
-                game.setBean(new Position(Context.INSTANCE.random().nextInt(game.getRow()), Context.INSTANCE.random().nextInt(game.getCol())));
-                break;
-            }
-        }
+        Position BeanPosition = game.getBean();
+        do {
+            BeanPosition = new Position(Context.INSTANCE.random().nextInt(game.getRow()), Context.INSTANCE.random().nextInt(game.getCol()));
+        } while (isBeanCollidingWithWall(BeanPosition));
+        game.setBean(BeanPosition);
+
         stopTimer();
         elapsedTime = 0;
         new AdvancedStage("game.fxml")
@@ -131,7 +145,24 @@ public class GameController implements Initializable {
                 .shows();
         gameStage.close();
     }
-
+    public static boolean isBeanCollidingWithWall(Position Bean) {
+        Game game = Context.INSTANCE.currentGame();
+        for (int j = 0; j < game.getWall().getThisWall().size(); j++) {
+            if (Bean.equals(game.getWall().getThisWall().get(j))) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public static boolean isBeanCollidingWithSnake(Position Bean) {
+        Game game = Context.INSTANCE.currentGame();
+        for (int j = 0; j < game.getSnake().getBody().size(); j++) {
+            if (Bean.equals(game.getSnake().getBody().get(j))) {
+                return true;
+            }
+        }
+        return false;
+    }
     public void QuitToHome() {
         if (Objects.nonNull(gameDaemonTask)) {
             gameDaemonTask.cancel(true);
@@ -142,6 +173,8 @@ public class GameController implements Initializable {
                 .shows();
         gameStage.close();
     }
+
+
 
     public void QuitToLogin() {
         if (Objects.nonNull(gameDaemonTask)) {
@@ -222,7 +255,7 @@ public class GameController implements Initializable {
     }
 
     private void startTimer() {
-        startTime = System.currentTimeMillis();
+        startTime = System.currentTimeMillis() - elapsedTime;
         timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override

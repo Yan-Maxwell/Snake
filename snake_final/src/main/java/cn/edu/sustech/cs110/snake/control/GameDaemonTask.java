@@ -39,24 +39,13 @@ public class GameDaemonTask implements Runnable {
             Position newTail = game.getSnake().getBody().get(game.getSnake().getBody().size() - 1);
             diffs.put(newTail, GridState.SNAKE_ON);
             game.setScore(game.getScore()+oneScore);
-            boolean coincide;
-            Position newOne;
+
+            Position BeanPosition = game.getBean();
             do {
-                coincide = false;
-                newOne = new Position(Context.INSTANCE.random().nextInt(game.getRow()), Context.INSTANCE.random().nextInt(game.getCol()));
-                for (int i = 0; i < game.getSnake().getBody().size(); i++) {
-                    if (newOne.equals(game.getSnake().getBody().get(i))) {
-                        for (int j = 0; j < game.getWall().getThisWall().size(); j++) {
-                            if (newOne.equals(game.getWall().getThisWall().get(j))) {
-                                coincide = true;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }while (coincide);
-            game.setBean(newOne);
-            diffs.put(newOne,GridState.BEAN_ON);
+                BeanPosition = new Position(Context.INSTANCE.random().nextInt(game.getRow()), Context.INSTANCE.random().nextInt(game.getCol()));
+            } while (GameController.isBeanCollidingWithWall(BeanPosition)||GameController.isBeanCollidingWithSnake(BeanPosition));
+            game.setBean(BeanPosition);
+            diffs.put(BeanPosition,GridState.BEAN_ON);
             Context.INSTANCE.eventBus().post(new BeanAteEvent(diffs));
         }
         //撞墙则Game Over

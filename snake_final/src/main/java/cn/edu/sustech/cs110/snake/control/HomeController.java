@@ -38,13 +38,15 @@ public class HomeController {
             read.next();
             Context.INSTANCE.currentGame().setHighestScore(read.nextInt());
         }
+
         Game game =Context.INSTANCE.currentGame();
-        for (int j = 0; j < game.getWall().getThisWall().size(); j++) {
-            if (game.getBean().equals(game.getWall().getThisWall().get(j))) {
-                game.setBean(new Position(Context.INSTANCE.random().nextInt(game.getRow()), Context.INSTANCE.random().nextInt(game.getCol())));
-                break;
-            }
+        Position BeanPosition = game.getBean();
+        do {
+            BeanPosition = new Position(Context.INSTANCE.random().nextInt(game.getRow()), Context.INSTANCE.random().nextInt(game.getCol()));
         }
+        while (isBeanCollidingWithWall(BeanPosition));
+        game.setBean(BeanPosition);
+
 
         new AdvancedStage("choose.fxml")
                 .withTitle("Choose your game")
@@ -52,23 +54,35 @@ public class HomeController {
         Begin.getScene().getWindow().hide();
     }
 
+    public boolean isBeanCollidingWithWall(Position Bean) {
+        Game game = Context.INSTANCE.currentGame();
+        for (int j = 0; j < game.getWall().getThisWall().size(); j++) {
+            if (Bean.equals(game.getWall().getThisWall().get(j))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void loadGame() throws FileNotFoundException {
-        Context.INSTANCE.currentGame(new Game(25, 25, Context.INSTANCE.getCurrentUser()));
+
         File file = new File(Context.INSTANCE.getCurrentUser()+"Archive.txt");
         if(file.exists()){
             Scanner read = new Scanner(file);
+            int x =read.nextInt();
+            int y = read.nextInt();
+            String duration = read.next();
+            int score = read.nextInt();
+            int highScore = read.nextInt();
+            int map = read.nextInt();
+            int difficulty = read.nextInt();
+            Context.INSTANCE.currentGame(new Game(25, 25, Context.INSTANCE.getCurrentUser(),map,difficulty,score));
             //读取豆子位置
-            Context.INSTANCE.currentGame().setBean(new Position(read.nextInt(), read.nextInt()));
+            Context.INSTANCE.currentGame().setBean(new Position(x, y));
             //读取持续时间
-            Context.INSTANCE.currentGame().setDuration(read.next());
-            //读取分数
-            Context.INSTANCE.currentGame().setScore(read.nextInt());
+            Context.INSTANCE.currentGame().setDuration(duration);
             //读取该玩家最高分
-            Context.INSTANCE.currentGame().setHighestScore(read.nextInt());
-            //读取地图
-            Context.INSTANCE.currentGame().setMap(read.nextInt());
-            //读取难度
-            Context.INSTANCE.currentGame().setDifficulty(read.nextInt());
+            Context.INSTANCE.currentGame().setHighestScore(highScore);
             //读取蛇身位置集合
             while(read.hasNext()){
                 Context.INSTANCE.currentGame().getSnake().getBody().add(0,new Position(read.nextInt(), read.nextInt()));
