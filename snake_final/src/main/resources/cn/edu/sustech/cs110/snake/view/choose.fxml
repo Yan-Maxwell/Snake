@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.edu.sustech.cs110.snake.control.ChooseController">
+   <children>
+      <ImageView fitHeight="622.0" fitWidth="701.0" layoutX="-77.0" layoutY="-47.0">
+         <image>
+            <Image url="@chooseback.jpeg" />
+         </image>
+      </ImageView>
+      <Button fx:id="Easy" layoutX="55.0" layoutY="119.0" mnemonicParsing="false" onAction="#chooseEasy" prefHeight="40.0" prefWidth="135.0" text="Easy">
+         <font>
+            <Font name="Krungthep" size="20.0" />
+         </font>
+      </Button>
+      <Button fx:id="Medium" layoutX="245.0" layoutY="119.0" mnemonicParsing="false" onAction="#chooseMedium" prefHeight="40.0" prefWidth="135.0" text="Medium">
+         <font>
+            <Font name="Krungthep" size="20.0" />
+         </font>
+      </Button>
+      <Button fx:id="Hard" layoutX="432.0" layoutY="119.0" mnemonicParsing="false" onAction="#chooseHard" prefHeight="39.0" prefWidth="135.0" text="Hard">
+         <font>
+            <Font name="Krungthep" size="20.0" />
+         </font>
+      </Button>
+      <Button fx:id="Map1" layoutX="55.0" layoutY="239.0" mnemonicParsing="false" onAction="#chooseH" prefHeight="38.0" prefWidth="135.0" text="Map H">
+         <font>
+            <Font name="Krungthep" size="20.0" />
+         </font></Button>
+      <Button fx:id="Map2" layoutX="244.0" layoutY="239.0" mnemonicParsing="false" onAction="#chooseL" prefHeight="38.0" prefWidth="135.0" text="Map L">
+         <font>
+            <Font name="Krungthep" size="20.0" />
+         </font></Button>
+      <Button fx:id="Map3" layoutX="432.0" layoutY="239.0" mnemonicParsing="false" onAction="#chooseT" prefHeight="38.0" prefWidth="135.0" text="Map T">
+         <font>
+            <Font name="Krungthep" size="20.0" />
+         </font></Button>
+      <Button fx:id="Back" layoutX="55.0" layoutY="316.0" mnemonicParsing="false" onAction="#toBack" prefHeight="54.0" prefWidth="125.0" text="Back">
+         <font>
+            <Font name="Bernard MT Condensed" size="30.0" />
+         </font>
+      </Button>
+      <Button fx:id="Enter" layoutX="327.0" layoutY="318.0" mnemonicParsing="false" onAction="#toEnter" prefHeight="54.0" prefWidth="257.0" text="Enter the game" textFill="#a44a4a">
+         <font>
+            <Font name="Berlin Sans FB" size="30.0" />
+         </font>
+      </Button>
+      <Text fx:id="difficultyText" fill="#ebacac" layoutX="26.0" layoutY="92.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Choose Difficulty">
+         <font>
+            <Font name="Berlin Sans FB Demi Bold" size="40.0" />
+         </font>
+      </Text>
+      <Text fx:id="mapText" fill="#ebacac" layoutX="29.0" layoutY="213.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Choose Map">
+         <font>
+            <Font name="Berlin Sans FB Demi Bold" size="40.0" />
+         </font>
+      </Text>
+   </children>
+</Pane>

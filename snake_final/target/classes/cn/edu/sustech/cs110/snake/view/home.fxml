@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox fx:id="root" prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.edu.sustech.cs110.snake.control.HomeController">
+   <Pane prefHeight="400.0" prefWidth="640.0">
+      <children>
+         <ImageView fitHeight="400.0" fitWidth="640.0">
+            <image>
+               <Image url="@homescreen.jpeg" />
+            </image>
+         </ImageView>
+            <Button fx:id="Begin" layoutX="432.0" layoutY="315.0" onAction="#playGame" prefHeight="62.0" prefWidth="194.0" text="New game" textAlignment="CENTER" textFill="#4a2b2b">
+                <font>
+                    <Font name="Berlin Sans FB" size="30.0" />
+                </font>
+            </Button>
+            <Button fx:id="Load" layoutX="14.0" layoutY="315.0" mnemonicParsing="false" onAction="#loadGame" prefHeight="62.0" prefWidth="194.0" text="Load game" textAlignment="CENTER" textFill="#4a2b2b">
+                <font>
+                    <Font name="Berlin Sans FB" size="30.0" />
+                </font>
+            </Button>
+            <Button fx:id="ShowRank" layoutX="236.0" layoutY="239.0" onAction="#showranking" prefHeight="70.0" prefWidth="169.0" text="RANK" textFill="#3b9e66">
+                <font>
+                    <Font name="Berlin Sans FB" size="40.0" />
+                </font>
+            </Button>
+      </children>
+   </Pane>
+</VBox>
