@@ -30,9 +30,10 @@ public class Game {
         this.setHighestScore(0);
         this.snake = new Snake(Direction.random());
         this.snake.getBody().add(new Position(row / 2, col / 2));
-        this.bean = new Position(Context.INSTANCE.random().nextInt(row), Context.INSTANCE.random().nextInt(col));
+        this.setBean(new Position(Context.INSTANCE.random().nextInt(row), Context.INSTANCE.random().nextInt(col)));
         this.difficulty=1;
         this.wall = new Wall();
+        this.setDuration("00:00:000");
     }
 
     public Game(int row, int col, String str,int difficulty, int map) {
@@ -40,6 +41,21 @@ public class Game {
         this.col = col;
         this.player = str;
         this.setScore(0);
+        this.setHighestScore(0);
+        this.snake = new Snake(Direction.random());
+        this.snake.getBody().add(new Position(row / 2, col / 2));
+        this.bean = new Position(Context.INSTANCE.random().nextInt(row), Context.INSTANCE.random().nextInt(col));
+        this.difficulty = difficulty;
+        this.map = map;
+        this.wall = new Wall(map);
+        this.setDuration("00:00:000");
+    }
+
+    public Game(int row, int col, String str,int difficulty, int map, int score) {
+        this.row = row;
+        this.col = col;
+        this.player = str;
+        this.score = score;
         this.setHighestScore(0);
         this.snake = new Snake(Direction.random());
         this.snake.getBody().add(new Position(row / 2, col / 2));
