@@ -25,7 +25,7 @@ public enum Direction {
         return this.yDiff;
     }
 
-    private Direction(final int xDiff, final int yDiff) {
+    Direction(final int xDiff, final int yDiff) {
         this.xDiff = xDiff;
         this.yDiff = yDiff;
     }

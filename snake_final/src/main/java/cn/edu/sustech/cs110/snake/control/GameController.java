@@ -75,13 +75,10 @@ public class GameController implements Initializable {
             }
             gameStage = (Stage) root.getScene().getWindow();
         }, 0, 1000, TimeUnit.MILLISECONDS);
-
         elapsedTime = convertDurationToMilliseconds(Context.INSTANCE.currentGame().getDuration());
-
         setupDaemonScheduler();
         textTimeAlive.setText("Time alive: "+Context.INSTANCE.currentGame().getDuration()+" s");
         textCurrentScore.setText("Current score: "+Context.INSTANCE.currentGame().getScore());
-
         Platform.runLater(this::bindAccelerators);
         board.paint(Context.INSTANCE.currentGame());
     }
@@ -121,14 +118,16 @@ public class GameController implements Initializable {
         }
         // 创建新的游戏对象
         Context.INSTANCE.currentGame(new Game(25, 25, Context.INSTANCE.getCurrentUser(),Context.INSTANCE.currentGame().getDifficulty(), Context.INSTANCE.currentGame().getMap()));
-        File file = new File(Context.INSTANCE.getCurrentUser()+"Archive.txt");
+        File file = new File("rank.txt");
         if(file.exists()){
             Scanner read = new Scanner(file);
-            read.next();
-            read.next();
-            read.next();
-            read.next();
-            Context.INSTANCE.currentGame().setHighestScore(read.nextInt());
+            while (read.hasNext()){
+                String str=read.next();
+                int n= read.nextInt();
+                if(str.equals(Context.INSTANCE.currentGame().getPlayer()) && n>Context.INSTANCE.currentGame().getHighestScore()){
+                    Context.INSTANCE.currentGame().setHighestScore(n);
+                }
+            }
         }
 
         Game game =Context.INSTANCE.currentGame();
@@ -137,13 +136,12 @@ public class GameController implements Initializable {
             BeanPosition = new Position(Context.INSTANCE.random().nextInt(game.getRow()), Context.INSTANCE.random().nextInt(game.getCol()));
         } while (isBeanCollidingWithWall(BeanPosition));
         game.setBean(BeanPosition);
-
+        gameStage.close();
         stopTimer();
         elapsedTime = 0;
         new AdvancedStage("game.fxml")
                 .withTitle("Snake")
                 .shows();
-        gameStage.close();
     }
     public static boolean isBeanCollidingWithWall(Position Bean) {
         Game game = Context.INSTANCE.currentGame();
@@ -163,19 +161,51 @@ public class GameController implements Initializable {
         }
         return false;
     }
-    public void QuitToHome() {
+    public void QuitToHome() throws FileNotFoundException {
         if (Objects.nonNull(gameDaemonTask)) {
             gameDaemonTask.cancel(true);
         }
+
+        //刷新排行榜
+        File file = new File("records.txt");
+        File file2 = new File("rank.txt");
+        Scanner read = new Scanner(file);
+        PrintWriter pw = new PrintWriter(file2);
+        //创建并录入集合
+        ArrayList<String> names = new ArrayList<>();
+        ArrayList<Integer> scores = new ArrayList<>();
+        ArrayList<Boolean> marks = new ArrayList<>();
+        while(read.hasNext()) {
+            names.add(0,read.next());
+            scores.add(0,read.nextInt());
+            marks.add(0,false);
+        }
+        int max;
+        for (int i = 0 ; i < scores.size() ; i++){
+            max=0;
+            //遍历找最高分
+            for (int i1 = 0; i1 < scores.size(); i1++) {
+                if(scores.get(i1)>max && !marks.get(i1)){
+                    max=scores.get(i1);
+                }
+            }
+            //再次遍历，记录最高分和玩家，并改变mark
+            for (int i1 = 0; i1 < names.size(); i1++) {
+                if(scores.get(i1)==max && !marks.get(i1)){
+                    pw.println(names.get(i1)+" "+scores.get(i1));
+                    marks.set(i1,true);
+                }
+            }
+        }
+        pw.close();
+        read.close();
+
         // 返回主页
         new AdvancedStage("home.fxml")
                 .withTitle("HOME")
                 .shows();
         gameStage.close();
     }
-
-
-
     public void QuitToLogin() {
         if (Objects.nonNull(gameDaemonTask)) {
             gameDaemonTask.cancel(true);
@@ -186,14 +216,12 @@ public class GameController implements Initializable {
                 .shows();
         gameStage.close();
     }
-
     public void record() throws IOException {
         File file = new File("records.txt");
         PrintWriter pw = new PrintWriter(new FileWriter(file,true));
         pw.println(Context.INSTANCE.currentGame().getPlayer()+" "+Context.INSTANCE.currentGame().getScore());
         pw.close();
     }
-
     private void updateScoreLabel() {
         int score = Context.INSTANCE.currentGame().getScore();
         Platform.runLater(() -> {
@@ -201,7 +229,6 @@ public class GameController implements Initializable {
             Context.INSTANCE.currentGame().setScore(score);
         });
     }
-
 
     public void doSave() throws IOException {
         File file = new File(Context.INSTANCE.currentGame().getPlayer()+"Archive.txt");
@@ -212,26 +239,14 @@ public class GameController implements Initializable {
         save.println(Context.INSTANCE.currentGame().getDuration());
         //存分数
         save.println(Context.INSTANCE.currentGame().getScore());
-        //存个人最高分
-        File file2 = new File("rank.txt");
-        Scanner read = new Scanner(file2);
-        int highest = 0;
-        while(read.hasNext()){
-            if(read.next().equals(Context.INSTANCE.currentGame().getPlayer())){
-                int test = read.nextInt();
-                if (highest<test){
-                    highest=test;
-                }
-
-            }
-        }
-        save.println(highest);
         //存地图
         save.println(Context.INSTANCE.currentGame().getMap());
         //存难度
         save.println(Context.INSTANCE.currentGame().getDifficulty());
+        //存方向
+        save.println(Context.INSTANCE.currentGame().getSnake().getDirection().getXDiff()+" "+Context.INSTANCE.currentGame().getSnake().getDirection().getYDiff());
         //存蛇身位置集合
-        for (int i = Context.INSTANCE.currentGame().getSnake().getBody().size()-1; i > 0 ; i--) {
+        for (int i = Context.INSTANCE.currentGame().getSnake().getBody().size()-1 ; i >= 0 ; i--) {
             save.println(Context.INSTANCE.currentGame().getSnake().getBody().get(i).getX()+" "+Context.INSTANCE.currentGame().getSnake().getBody().get(i).getY());
         }
 
@@ -255,7 +270,7 @@ public class GameController implements Initializable {
     }
 
     private void startTimer() {
-        startTime = System.currentTimeMillis() - elapsedTime;
+        startTime = System.currentTimeMillis();
         timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -331,7 +346,42 @@ public class GameController implements Initializable {
     @Subscribe
     public void gameOver(GameOverEvent event) throws IOException {
 
+        //记录本局游戏
         record();
+
+        //刷新排行榜
+        File file = new File("records.txt");
+        File file2 = new File("rank.txt");
+        Scanner read = new Scanner(file);
+        PrintWriter pw = new PrintWriter(file2);
+        //创建并录入集合
+        ArrayList<String> names = new ArrayList<>();
+        ArrayList<Integer> scores = new ArrayList<>();
+        ArrayList<Boolean> marks = new ArrayList<>();
+        while(read.hasNext()) {
+            names.add(0,read.next());
+            scores.add(0,read.nextInt());
+            marks.add(0,false);
+        }
+        int max;
+        for (int i = 0 ; i < scores.size() ; i++){
+            max=0;
+            //遍历找最高分
+            for (int i1 = 0; i1 < scores.size(); i1++) {
+                if(scores.get(i1)>max && !marks.get(i1)){
+                    max=scores.get(i1);
+                }
+            }
+            //再次遍历，记录最高分和玩家，并改变mark
+            for (int i1 = 0; i1 < names.size(); i1++) {
+                if(scores.get(i1)==max && !marks.get(i1)){
+                    pw.println(names.get(i1)+" "+scores.get(i1));
+                    marks.set(i1,true);
+                }
+            }
+        }
+        pw.close();
+        read.close();
 
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -351,7 +401,11 @@ public class GameController implements Initializable {
             if (result.isPresent()) {
                 if (result.get() == backToMainButton) {
                     alert.close();
-                    QuitToHome();
+                    try {
+                        QuitToHome();
+                    } catch (FileNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
                 } else if (result.get() == restartButton) {
                     try {
                         doRestart();

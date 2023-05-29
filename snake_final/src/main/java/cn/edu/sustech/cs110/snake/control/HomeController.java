@@ -1,5 +1,6 @@
 package cn.edu.sustech.cs110.snake.control;
 
+import cn.edu.sustech.cs110.snake.enums.Direction;
 import cn.edu.sustech.cs110.snake.model.Game;
 import cn.edu.sustech.cs110.snake.model.Position;
 import cn.edu.sustech.cs110.snake.view.AdvancedStage;
@@ -29,14 +30,16 @@ public class HomeController {
 
     public void playGame() throws FileNotFoundException {
         Context.INSTANCE.currentGame(new Game(25, 25, Context.INSTANCE.getCurrentUser()));
-        File file = new File(Context.INSTANCE.getCurrentUser()+"Archive.txt");
+        File file = new File("rank.txt");
         if(file.exists()){
             Scanner read = new Scanner(file);
-            read.next();
-            read.next();
-            read.next();
-            read.next();
-            Context.INSTANCE.currentGame().setHighestScore(read.nextInt());
+            while (read.hasNext()){
+                String str=read.next();
+                int n= read.nextInt();
+                if(str.equals(Context.INSTANCE.currentGame().getPlayer()) && n>Context.INSTANCE.currentGame().getHighestScore()){
+                    Context.INSTANCE.currentGame().setHighestScore(n);
+                }
+            }
         }
 
         Game game =Context.INSTANCE.currentGame();
@@ -73,16 +76,39 @@ public class HomeController {
             int y = read.nextInt();
             String duration = read.next();
             int score = read.nextInt();
-            int highScore = read.nextInt();
             int map = read.nextInt();
             int difficulty = read.nextInt();
-            Context.INSTANCE.currentGame(new Game(25, 25, Context.INSTANCE.getCurrentUser(),map,difficulty,score));
+            int xDiff = read.nextInt();
+            int yDiff = read.nextInt();
+            Direction d;
+            if (xDiff==-1){
+                d=Direction.UP;
+            } else if (xDiff==1) {
+                d=Direction.DOWN;
+            } else if (yDiff==1) {
+                d=Direction.RIGHT;
+            } else {
+                d=Direction.LEFT;
+            }
+            Context.INSTANCE.currentGame(new Game(25, 25, Context.INSTANCE.getCurrentUser(),difficulty,map,score));
             //读取豆子位置
             Context.INSTANCE.currentGame().setBean(new Position(x, y));
             //读取持续时间
             Context.INSTANCE.currentGame().setDuration(duration);
             //读取该玩家最高分
-            Context.INSTANCE.currentGame().setHighestScore(highScore);
+            File file1 = new File("rank.txt");
+            if(file1.exists()){
+                Scanner read1 = new Scanner(file1);
+                while (read1.hasNext()){
+                    String str=read1.next();
+                    int n= read1.nextInt();
+                    if(str.equals(Context.INSTANCE.currentGame().getPlayer()) && n>Context.INSTANCE.currentGame().getHighestScore()){
+                        Context.INSTANCE.currentGame().setHighestScore(n);
+                    }
+                }
+            }
+            //读取方向
+            Context.INSTANCE.currentGame().getSnake().setDirection(d);
             //读取蛇身位置集合
             while(read.hasNext()){
                 Context.INSTANCE.currentGame().getSnake().getBody().add(0,new Position(read.nextInt(), read.nextInt()));
